@@ -127,7 +127,7 @@ app.post("/add-friends", async (req, res) => {
 app.get("/get-user/:user_name", (req, res) => {
   console.log(req.params.user_name);
   model
-    .find({ email: {$regex:req.params.user_name}})
+    .find({ email: { $regex: req.params.user_name } })
     .then((result) => {
       res.send(result);
       if (result.length > 0) {
@@ -142,12 +142,11 @@ app.get("/get-user/:user_name", (req, res) => {
 });
 
 var corsOptions = {
-  origin: 'http://localhost:3000',
-  optionsSuccessStatus: 200
-}
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200,
+};
 
-
-app.post("/register/:user_id",cors(corsOptions), (req, res,next) => {
+app.post("/register/:user_id", cors(corsOptions), (req, res, next) => {
   console.log(req.body);
   const searchId = req.params.user_id;
   console.log(searchId);
@@ -282,45 +281,29 @@ const server = app.listen(port, () => {
 //   })
 // })
 
-const io = require('socket.io')(server,{
-  pingTimeout:60000,
-  cors:{
-    origin:"http://localhost:3000",
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "http://localhost:3000",
   },
-})
+});
 
 io.on("connection", (socket) => {
   console.log("connected to socket.io");
 
+  socket.on("setup", (userData) => {
+    socket.join(userData);
+    console.log(userData);
+    socket.emit("connected");
+  });
 
-  socket.on('setup',(userData)=>{
-    socket.join(userData)
-    console.log(userData)
-    socket.emit('connected')
-  })
-
-  socket.on('join_chat',(room)=>{
+  socket.on("join_chat", (room) => {
     socket.join(room);
-    console.log("user joined room :" + room)
-  })
+    console.log("user joined room :" + room);
+  });
 
-  socket.on('new_message',({user_id,friend_id,messages})=>{
-    console.log('new message received',{user_id,friend_id,messages});
-    socket.in(user_id).emit("message_received",messages.text)
-    // console.log("user id, friend id, message",user_id,friend_id,message)
-    // socket.in({
-    //   user_id,
-    //   friend_id,
-    //   messages
-    // })
-    // var chat = newMessageReceived.chat;
-    // if(!chat.users) return console.log("chat.users not defined")
-
-    // chat.users.forEach(user=>{
-    //   if(user._id == newMessageReceived.sender._id) return
-
-    //   socket.in(user._id).emit("message received", newMessageReceived)
-    // })
-  })
-  
+  socket.on("new_message", ({ user_id, friend_id, messages }) => {
+    console.log("new message received", { user_id, friend_id, messages });
+    socket.in(user_id).emit("message_received", messages);
+  });
 });
