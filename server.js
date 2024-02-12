@@ -306,4 +306,10 @@ io.on("connection", (socket) => {
     console.log("new message received", { user_id, friend_id, messages });
     socket.in(user_id).emit("message_received", messages);
   });
+
+  socket.on("getNotified", ({ user_id, received, friend_id }) => {
+    console.log("notified ", user_id, received, friend_id);
+
+    socket.in(user_id).emit("notificationReceived", received, friend_id);
+  });
 });
