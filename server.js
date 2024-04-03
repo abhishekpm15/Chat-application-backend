@@ -11,6 +11,7 @@ const path = require("path");
 require("dotenv").config();
 
 var port = process.env.PORT || 3001;
+const FRONT_END_URL = process.env.API_END_POINT
 
 mongoose
   .connect(
@@ -142,7 +143,7 @@ app.get("/get-user/:user_name", (req, res) => {
 });
 
 var corsOptions = {
-  origin: "http://localhost:3000",
+  origin: `${FRONT_END_URL}`,
   optionsSuccessStatus: 200,
 };
 
@@ -284,7 +285,7 @@ const server = app.listen(port, () => {
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3000",
+    origin: `${FRONT_END_URL}`,
   },
 });
 
